@@ -23,8 +23,8 @@ export class CardService {
     return entity;
   }
 
-  findAll(): Promise<Card[]> {
-    return this.cardRepository.find();
+  public paginate(options: IPaginationOptions): Promise<Pagination<Card>> {
+    return paginate<Card>(this.cardRepository, options);
   }
 
   public create(cardDto: CardDto, urlImage: string): Promise<Card> {
@@ -36,11 +36,14 @@ export class CardService {
     return this.cardRepository.update(cardDto.id, cardDto);
   }
 
-  async remove(id: number): Promise<DeleteResult> {
-    return this.cardRepository.delete(id);
-  }
-
-  async paginate(options: IPaginationOptions): Promise<Pagination<Card>> {
-    return paginate<Card>(this.cardRepository, options);
+  async remove(id: number): Promise<Card> {
+    return await this.cardRepository
+      .findOneBy({
+        id: id,
+      })
+      .then((card) => {
+        this.cardRepository.remove(card);
+        return card;
+      });
   }
 }

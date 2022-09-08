@@ -4,6 +4,7 @@ import {
   DefaultValuePipe,
   Delete,
   Get,
+  HttpCode,
   Param,
   ParseIntPipe,
   Post,
@@ -41,9 +42,16 @@ export class CardController {
       .catch(() => this.cloudinaryService.deleteImage(cloudinaryData.publicId));
   }
 
-  @Get('/getAll')
-  async getAll() {
-    return await this.cardService.findAll();
+  @Get('/getPage')
+  async getPage(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+  ): Promise<Pagination<Card>> {
+    limit = limit > 100 ? 100 : limit;
+    return await this.cardService.paginate({
+      page,
+      limit,
+    });
   }
 
   @Put('/update')
@@ -51,22 +59,18 @@ export class CardController {
     return await this.cardService.update(cardDto);
   }
 
-  @Delete('/delete/:id')
-  async delete(@Param('id') id: number) {
-    return await this.cardService.remove(id).then((result) => {
-      return result.raw;
-    });
-  }
-
-  @Get('/getPage')
-  async getPage(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
-  ): Promise<Pagination<Card>> {
-    limit = limit > 100 ? 100 : limit;
-    return this.cardService.paginate({
-      page,
-      limit,
-    });
+  @Delete('/delete')
+  async delete(@Query('id') id: number) {
+    return await this.cardService
+      .remove(id)
+      .then((card) => {
+        if (card && card.urlImage) {
+          this.cloudinaryService.deleteImage(card.urlImage);
+        }
+        return 'Deleted';
+      })
+      .catch((err) => {
+        return err;
+      });
   }
 }
