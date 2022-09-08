@@ -27,6 +27,7 @@
     "buffer-to-stream": "^1.0.0",
     "cloudinary": "^1.31.0",
     "dotenv": "^16.0.2",
+    "nestjs-typeorm-paginate": "^4.0.2",
     "pg": "^8.8.0",
     "postgresql": "^0.0.1",
     "reflect-metadata": "^0.1.13",
