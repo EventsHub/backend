@@ -1,9 +1,24 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, UploadedFile, UseInterceptors} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    DefaultValuePipe,
+    Delete,
+    Get,
+    Param,
+    ParseIntPipe,
+    Post,
+    Put,
+    Query,
+    UploadedFile,
+    UseInterceptors
+} from '@nestjs/common';
 import {FileInterceptor} from '@nestjs/platform-express';
 import {Express} from 'express';
 import {CardDto} from './card.dto';
 import {CardService} from './card.service';
 import {CloudinaryService} from "../cloudinary/cloudinary.service";
+import {Pagination} from "nestjs-typeorm-paginate";
+import {Card} from "./card.entity";
 
 @Controller('/api/card')
 export class CardController {
@@ -40,5 +55,16 @@ export class CardController {
             return result.raw;
         });
 
+    }
+
+    @Get('/getPage')
+    async getPage(@Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+                  @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+    ): Promise<Pagination<Card>> {
+        limit = limit > 100 ? 100 : limit;
+        return this.cardService.paginate({
+            page,
+            limit
+        });
     }
 }

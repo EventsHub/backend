@@ -3,6 +3,7 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {DeleteResult, Repository, UpdateResult} from 'typeorm';
 import {CardDto} from './card.dto';
 import {Card} from './card.entity';
+import {IPaginationOptions, Pagination, paginate} from "nestjs-typeorm-paginate";
 
 @Injectable()
 export class CardService {
@@ -38,5 +39,9 @@ export class CardService {
 
     async remove(id: number): Promise<DeleteResult> {
         return this.cardRepository.delete(id);
+    }
+
+    async paginate(options: IPaginationOptions): Promise<Pagination<Card>> {
+        return paginate<Card>(this.cardRepository, options);
     }
 }
