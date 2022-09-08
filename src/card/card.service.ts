@@ -13,7 +13,7 @@ export class CardService {
     private readonly cardRepository: Repository<Card>,
     @Inject(CardTransformer)
     private readonly cardTransformer: CardTransformer,
-  ) {}
+  ) { }
 
   public paginate(options: IPaginationOptions): Promise<Pagination<Card>> {
     return paginate<Card>(this.cardRepository, options);
@@ -24,8 +24,9 @@ export class CardService {
     return this.cardRepository.save(card);
   }
 
-  public update(cardDto: CardDto): Promise<UpdateResult> {
-    return this.cardRepository.update(cardDto.id, cardDto);
+  public update(cardDto: CardDto, urlImage: string): Promise<UpdateResult> {
+    const card = this.cardTransformer.toEntity(cardDto, urlImage);
+    return this.cardRepository.update(cardDto.id, card);
   }
 
   async remove(id: number): Promise<Card> {
@@ -35,6 +36,16 @@ export class CardService {
       })
       .then((card) => {
         this.cardRepository.remove(card);
+        return card;
+      });
+  }
+
+  async findById(id: number): Promise<Card> {
+    return await this.cardRepository
+      .findOneBy({
+        id: id,
+      })
+      .then((card) => {
         return card;
       });
   }
