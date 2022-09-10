@@ -1,3 +1,4 @@
+import { UserModule } from './user/user.module';
 import { CardModule } from './card/card.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -5,11 +6,13 @@ import { CloudinaryService } from './cloudinary/cloudinary.service';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CloudinaryProvider } from './cloudinary/cloudinary.provider';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    UserModule,
+    AuthModule,
     ConfigModule.forRoot(),
-    CardModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -26,4 +29,4 @@ import { ConfigModule } from '@nestjs/config';
   controllers: [],
   providers: [CloudinaryService, CloudinaryProvider],
 })
-export class AppModule { }
+export class AppModule {}
